@@ -1,4 +1,4 @@
-from binance import Client
+from binance.client import Client
 
 
 class BinanceLeverage:
@@ -30,6 +30,7 @@ class BinanceOrder:
         self.client = Client(api_key, api_secret)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
+        self.client.API_URL = 'https://testnet.binance.vision/api'
 
     def get_precision(self, symbol):
         info = self.client.futures_exchange_info()
@@ -54,7 +55,6 @@ class BinanceOrder:
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)
-
     def buy(self, symbol, leverage, quantity=None, max_quantity_ratio=0.1):
         self.order.create_order(Client.SIDE_BUY, symbol, leverage, quantity, max_quantity_ratio)
 

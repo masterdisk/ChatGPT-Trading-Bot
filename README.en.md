@@ -151,13 +151,13 @@ This repository teaches you how to use ChatGPT to help you write trading program
         For example:
         ```json
         {
-        "passphrase": "Zw'4Tx^5/]f/pN>}fx*9m6<X,fxLx;x(",
+        "passphrase": "eduardo2226969",
         "symbol": "BTCUSDT",
         "leverage": 10,
         "quantity": 0.002,
         "time": "{{time}}",
-        "close": {{close}},
-        "message": {{strategy.order.alert_message}}
+        "close": "{{close}}",
+        "message": "{{strategy.order.alert_message}}"
         }
         ```
         > Explanation: Contract trading set `BTCUSDT` trading pair leverage to `10` times, quantity `0.002` BTC.

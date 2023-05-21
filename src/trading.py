@@ -91,7 +91,7 @@ class BinanceOrder:
 
         params['signature'] = signature
 
-        Client.futures_create_order(**params)
+        self.client.futures_create_order(**params)
 
 
 class BinanceTrading:

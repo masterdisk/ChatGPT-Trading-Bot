@@ -75,7 +75,7 @@ class BinanceOrder:
             'type': 'LIMIT',
             'timeInForce': 'GTC',
             'quantity': quantity,
-            'closePosition': price,
+            'price': price,
             'recvWindow': 5000,
             'timestamp': get_server_time()
         }

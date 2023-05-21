@@ -1,4 +1,8 @@
 from binance.client import Client
+import time
+import requests
+import hmac
+import hashlib
 
 
 class BinanceLeverage:
@@ -9,6 +13,15 @@ class BinanceLeverage:
     def change_leverage(self, symbol, leverage):
         self.leverage_mapping[symbol] = leverage
         self.client.futures_change_leverage(symbol=symbol, leverage=leverage)
+
+
+def get_server_time():
+    """
+    Get Binance server time.
+    """
+    URL = "https://testnet.binancefuture.com/fapi/v1/time"
+    response = requests.get(URL)
+    return response.json()["serverTime"]
 
 
 class BinanceBalance:
@@ -30,7 +43,7 @@ class BinanceOrder:
         self.client = Client(api_key, api_secret)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
-        self.client.API_URL = 'https://testnet.binance.vision/api'
+        self.client.API_URL = 'https://testnet.binancefuture.com'
 
     def get_precision(self, symbol):
         info = self.client.futures_exchange_info()
@@ -38,7 +51,7 @@ class BinanceOrder:
             if x['symbol'] == symbol:
                 return x['quantityPrecision']
 
-    def create_order(self, side, symbol, leverage, quantity=None, max_quantity_ratio=0.1):
+    def create_order(self, side, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
         self.leverage.change_leverage(symbol, leverage)
         if not quantity:
             quantity = self.balance.get_max_qty(symbol, leverage) * max_quantity_ratio
@@ -46,17 +59,22 @@ class BinanceOrder:
         quantity = float(round(quantity, precision))
         self.client.futures_create_order(
             symbol=symbol,
-            type='MARKET',
             side=side,
-            quantity=quantity
+            type='MARKET',
+            timeInForce='GTC',
+            quantity=quantity,
+            price=price,
+            recvWindow=5000,
+            timestamp=get_server_time()
         )
 
 
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)
-    def buy(self, symbol, leverage, quantity=None, max_quantity_ratio=0.1):
-        self.order.create_order(Client.SIDE_BUY, symbol, leverage, quantity, max_quantity_ratio)
 
-    def sell(self, symbol, leverage, quantity=None, max_quantity_ratio=0.1):
-        self.order.create_order(Client.SIDE_SELL, symbol, leverage, quantity, max_quantity_ratio)
+    def buy(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
+        self.order.create_order(Client.SIDE_BUY, symbol, leverage, price, quantity, max_quantity_ratio)
+
+    def sell(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
+        self.order.create_order(Client.SIDE_SELL, symbol, leverage, price, quantity, max_quantity_ratio)

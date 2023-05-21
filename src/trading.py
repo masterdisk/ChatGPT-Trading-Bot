@@ -65,20 +65,11 @@ class BinanceOrder:
         precision = self.get_precision(symbol)
         quantity = float(round(quantity, precision))
 
-        symbol = symbol,
-        side = side,
-        type = 'MARKET',
-        timeInForce = 'GTC',
-        quantity = quantity,
-        price = price,
-        recvWindow = 5000,
-        timestamp = get_server_time()
-
         params = {
             'symbol': symbol,
             'side': side,
             'type': type,
-            'timeInForce': Client.TIME_IN_FORCE_GTC,
+            'timeInForce': 'GTC',
             'quantity': quantity,
             'closePosition': price,
             'recvWindow': 5000,

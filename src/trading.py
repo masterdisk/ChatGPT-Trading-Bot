@@ -4,8 +4,6 @@ import requests
 import hmac
 import hashlib
 
-from google.protobuf.text_encoding import string
-
 from src.logger import logger
 
 
@@ -80,7 +78,7 @@ class BinanceOrder:
         }
 
         logger.warning('p========EDUARDO _ PRIVATE KEY =======' + self.client.API_SECRET)
-        logger.warning('p========EDUARDO _ params =======' + string(params))
+        logger.warning('p========EDUARDO _ params =======' + str(params))
         logger.warning('p========EDUARDO _ API KEY =======' + self.client.API_KEY)
 
 

@@ -1,6 +1,5 @@
 import json
 import math
-
 from binance.client import Client
 import time
 import requests
@@ -85,7 +84,7 @@ class BinanceOrder:
             'timeInForce': 'GTC',
             'quantity': quantity,
             'price': price,
-            'recvWindow': 50000,
+            'recvWindow': 5000,
             'timestamp': get_server_time()
         }
 
@@ -97,7 +96,16 @@ class BinanceOrder:
                              hashlib.sha256).hexdigest()
 
         params['signature'] = signature
-        self.client.futures_create_order(**params)
+        headers = {
+            'X-MBX-APIKEY': self.client.API_KEY
+        }
+
+        response = requests.post('https://testnet.binancefuture.com/fapi/v1/order', params=params, headers=headers)
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to create order. Status code: {response.status_code}. Response: {response.text}")
+
+        # Handle the response as needed
 
 
 class BinanceTrading:

@@ -1,6 +1,5 @@
 from flask import Flask, request
 import requests
-
 import json
 import os
 from src.trading import BinanceTrading
@@ -15,7 +14,9 @@ binance_trading = BinanceTrading(os.environ.get('API_KEY'), os.environ.get('API_
 def tradingview_request():
     data = json.loads(request.data)
     logger.info(data)
-    if data.get('passphrase', None) != os.environ.get('PASSPHRASE'):
+
+    passphrase = os.environ.get('PASSPHRASE')
+    if data.get('passphrase') != passphrase:
         logger.warning('Wrong passphrase')
         return {
             'code': 'error',
@@ -27,16 +28,20 @@ def tradingview_request():
     quantity = data.get('quantity')
     price = data.get('price')
     max_quantity_ratio = data.get('max_quantity_ratio')
-    logger.info(
-        f'symbol:{symbol} ,leverage: {leverage}, price: {{price}}, quantity: {quantity}, max_quantity_ratio: {max_quantity_ratio}, message: {data.get("message")}')
-    if data.get('message') == 'Sell' or data.get('message') == 'Buy_Exit':
-        logger.info(
-            f'SELL: {symbol}, leverage: {leverage},price: {{price}}, quantity: {quantity}, max_quantity_ratio: {max_quantity_ratio}')
+    message = data.get('message')
+
+    logger.info(f'symbol: {symbol}, leverage: {leverage}, price: {price}, quantity: {quantity}, '
+                f'max_quantity_ratio: {max_quantity_ratio}, message: {message}')
+
+    if message in ['Sell', 'Buy_Exit']:
+        logger.info(f'SELL: symbol: {symbol}, leverage: {leverage}, price: {price}, quantity: {quantity}, '
+                    f'max_quantity_ratio: {max_quantity_ratio}')
         binance_trading.sell(symbol, leverage, price, quantity, max_quantity_ratio)
-    elif data.get('message') == 'Buy' or data.get('message') == 'Sell_Exit':
-        logger.info(
-            f'BUY: {symbol}, leverage: {leverage}, quantity: {quantity}, max_quantity_ratio: {max_quantity_ratio}')
+    elif message in ['Buy', 'Sell_Exit']:
+        logger.info(f'BUY: symbol: {symbol}, leverage: {leverage}, price: {price}, quantity: {quantity}, '
+                    f'max_quantity_ratio: {max_quantity_ratio}')
         binance_trading.buy(symbol, leverage, price, quantity, max_quantity_ratio)
+
     return {"message": "successful"}
 
 

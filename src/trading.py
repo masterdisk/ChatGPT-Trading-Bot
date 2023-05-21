@@ -8,7 +8,7 @@ from src.logger import logger
 
 class BinanceLeverage:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret)
+        self.client = Client(api_key, api_secret, testnet=True)
         self.leverage_mapping = {}
         self.client.API_URL = Client.API_TESTNET_URL
 
@@ -31,7 +31,7 @@ def get_server_time():
 
 class BinanceBalance:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret)
+        self.client = Client(api_key, api_secret, testnet=True)
         self.client.API_URL = Client.API_TESTNET_URL
 
     def get_max_qty(self, symbol, leverage):
@@ -46,7 +46,7 @@ class BinanceBalance:
 
 class BinanceOrder:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret)
+        self.client = Client(api_key, api_secret, testnet=True)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
         self.client.API_URL = Client.API_TESTNET_URL

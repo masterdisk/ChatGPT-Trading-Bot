@@ -8,9 +8,9 @@ from src.logger import logger
 
 class BinanceLeverage:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret, Client.FUTURES_TESTNET_URL)
+        self.client = Client(api_key, api_secret)
         self.leverage_mapping = {}
-
+        self.client.API_URL = Client.API_TESTNET_URL
     def change_leverage(self, symbol, leverage):
         self.leverage_mapping[symbol] = leverage
         self.client.futures_change_leverage(symbol=symbol, leverage=leverage)
@@ -28,7 +28,7 @@ def get_server_time():
 class BinanceBalance:
     def __init__(self, api_key, api_secret):
         self.client = Client(api_key, api_secret)
-
+        self.client.API_URL = Client.API_TESTNET_URL
     def get_max_qty(self, symbol, leverage):
         account_balance = self.client.futures_account_balance()
         ticker_price = self.client.futures_symbol_ticker(symbol=symbol)
@@ -44,7 +44,7 @@ class BinanceOrder:
         self.client = Client(api_key, api_secret, Client.FUTURES_TESTNET_URL)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
-
+        self.client.API_URL = Client.API_TESTNET_URL
     def get_precision(self, symbol):
         info = self.client.futures_exchange_info()
         for x in info['symbols']:
@@ -89,7 +89,7 @@ class BinanceOrder:
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)
-
+        self.client.API_URL = Client.API_TESTNET_URL
     def buy(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
         self.order.create_order(Client.SIDE_BUY, symbol, leverage, price, quantity, max_quantity_ratio)
 

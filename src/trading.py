@@ -66,10 +66,13 @@ class BinanceOrder:
         precision = self.get_precision(symbol)
         quantity = float(round(quantity, precision))
 
+        logger.warning('p========EDUARDO _ PRIVATE KEY =======' + self.client.API_SECRET)
+        logger.warning('p========EDUARDO _ API KEY =======' + self.client.API_KEY)
+
         params = {
             'symbol': symbol,
             'side': side,
-            'type': type,
+            'type': 'LIMIT',
             'timeInForce': 'GTC',
             'quantity': quantity,
             'closePosition': price,
@@ -77,9 +80,7 @@ class BinanceOrder:
             'timestamp': get_server_time()
         }
 
-        logger.warning('p========EDUARDO _ PRIVATE KEY =======' + self.client.API_SECRET)
         logger.warning('p========EDUARDO _ params =======' + str(params))
-        logger.warning('p========EDUARDO _ API KEY =======' + self.client.API_KEY)
 
 
         query_string = "&".join([f"{k}={v}" for k, v in params.items()])

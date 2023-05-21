@@ -1,3 +1,6 @@
+import json
+import math
+
 from binance.client import Client
 import time
 import requests
@@ -16,7 +19,7 @@ class BinanceLeverage:
     def change_leverage(self, symbol, leverage):
         try:
             self.leverage_mapping[symbol] = leverage
-            self.client.futures_change_leverage(symbol=symbol, leverage=leverage)
+            self.client.futures_change_leverage(symbol=symbol, leverage=leverage, timestamp=get_server_time())
         except Exception as e:
             logger.warning(f"Error changing leverage for {symbol} to {leverage}. Error: {str(e)}")
 
@@ -27,8 +30,11 @@ def get_server_time():
     """
     URL = "https://testnet.binancefuture.com/fapi/v1/time"
     response = requests.get(URL)
-    logger.warning('+++++++++++++++++++++' + str(response.json()["serverTime"]) + '++++++++++++++++++++++++++++++')
-    return response.json()["serverTime"]
+    if response.status_code == 200:
+        server_time = response.json()["serverTime"]
+        return server_time
+    else:
+        raise Exception(f"Failed to retrieve server time. Status code: {response.status_code}")
 
 
 class BinanceBalance:
@@ -60,12 +66,17 @@ class BinanceOrder:
                 return x['quantityPrecision']
 
     def create_order(self, side, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
-        logger.warning(self)
         self.leverage.change_leverage(symbol, leverage)
         if not quantity:
             quantity = self.balance.get_max_qty(symbol, leverage) * max_quantity_ratio
         precision = self.get_precision(symbol)
         quantity = float(round(quantity, precision))
+
+        tick_size = get_tick_size(symbol)
+        if tick_size is None:
+            raise Exception(f"Failed to retrieve tick size for symbol: {symbol}")
+
+        price = round(float(price), tick_size - 1)  # Convert to float and adjust the rounding precision
 
         params = {
             'symbol': symbol,
@@ -78,12 +89,14 @@ class BinanceOrder:
             'timestamp': get_server_time()
         }
 
+        params_json = json.dumps(params)
+        logger.warning(params_json)
+
         query_string = "&".join([f"{k}={v}" for k, v in params.items()])
         signature = hmac.new(self.client.API_SECRET.encode('utf-8'), query_string.encode('utf-8'),
                              hashlib.sha256).hexdigest()
 
         params['signature'] = signature
-        logger.warning('+++++++++++++++++++++' + str(params) + '++++++++++++++++++++++++++++++')
         self.client.futures_create_order(**params)
 
 
@@ -96,3 +109,19 @@ class BinanceTrading:
 
     def sell(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
         self.order.create_order(Client.SIDE_SELL, symbol, leverage, price, quantity, max_quantity_ratio)
+
+
+def get_tick_size(symbol):
+    client = Client("", "")  # Use an empty API key and secret for tick size retrieval
+    exchange_info = client.get_exchange_info()
+    symbol_info = next((s for s in exchange_info['symbols'] if s['symbol'] == symbol), None)
+
+    if symbol_info:
+        filters = symbol_info['filters']
+        price_filter = next((f for f in filters if f['filterType'] == 'PRICE_FILTER'), None)
+        if price_filter:
+            min_price = float(price_filter['minPrice'])
+            tick_size = abs(int(-math.log10(min_price)))
+            return tick_size
+
+    return None

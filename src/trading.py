@@ -27,7 +27,7 @@ def get_server_time():
     """
     URL = "https://testnet.binancefuture.com/fapi/v1/time"
     response = requests.get(URL)
-    logger.warning('+++++++++++++++++++++' + response.json()["serverTime"] + '++++++++++++++++++++++++++++++')
+    logger.warning('+++++++++++++++++++++' + str(response.json()["serverTime"]) + '++++++++++++++++++++++++++++++')
     return response.json()["serverTime"]
 
 

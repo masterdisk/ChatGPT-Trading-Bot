@@ -8,7 +8,7 @@ from src.logger import logger
 
 app = Flask(__name__)
 
-binance_trading = BinanceTrading(os.environ.get('API_KEY'), os.environ.get('API_SECRET_KEY'), Client.FUTURES_TESTNET_URL)
+binance_trading = BinanceTrading(os.environ.get('API_KEY'), os.environ.get('API_SECRET_KEY'))
 
 
 @app.route('/webhook', methods=['POST'])

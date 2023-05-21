@@ -89,7 +89,6 @@ class BinanceOrder:
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)
-        self.client.API_URL = Client.API_TESTNET_URL
     def buy(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
         self.order.create_order(Client.SIDE_BUY, symbol, leverage, price, quantity, max_quantity_ratio)
 

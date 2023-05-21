@@ -52,6 +52,7 @@ class BinanceOrder:
                 return x['quantityPrecision']
 
     def create_order(self, side, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
+        logger.info(self)
         self.leverage.change_leverage(symbol, leverage)
         if not quantity:
             quantity = self.balance.get_max_qty(symbol, leverage) * max_quantity_ratio
@@ -85,7 +86,7 @@ class BinanceOrder:
 
         Client.futures_create_order(**params)
 
-        logger.info(**params)
+
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)

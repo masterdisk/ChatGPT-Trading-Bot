@@ -3,6 +3,9 @@ import time
 import requests
 import hmac
 import hashlib
+
+from google.protobuf.text_encoding import string
+
 from src.logger import logger
 
 
@@ -75,6 +78,11 @@ class BinanceOrder:
             'recvWindow': 5000,
             'timestamp': get_server_time()
         }
+
+        logger.warning('p========EDUARDO _ PRIVATE KEY =======' + self.client.API_SECRET)
+        logger.warning('p========EDUARDO _ params =======' + string(params))
+        logger.warning('p========EDUARDO _ API KEY =======' + self.client.API_KEY)
+
 
         query_string = "&".join([f"{k}={v}" for k, v in params.items()])
         signature = hmac.new(self.client.API_SECRET.encode('utf-8'), query_string.encode('utf-8'),

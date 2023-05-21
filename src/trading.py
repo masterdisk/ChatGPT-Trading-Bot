@@ -76,7 +76,7 @@ class BinanceOrder:
             'timeInForce': 'GTC',
             'quantity': quantity,
             'price': price,
-            'recvWindow': 5000,
+            'recvWindow': 50000,
             'timestamp': get_server_time()
         }
 

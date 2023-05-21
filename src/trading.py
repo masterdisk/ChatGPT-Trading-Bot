@@ -7,7 +7,7 @@ import hashlib
 
 class BinanceLeverage:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret)
+        self.client = Client(api_key, api_secret, Client.FUTURES_TESTNET_URL)
         self.leverage_mapping = {}
 
     def change_leverage(self, symbol, leverage):
@@ -40,10 +40,9 @@ class BinanceBalance:
 
 class BinanceOrder:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret)
+        self.client = Client(api_key, api_secret, Client.FUTURES_TESTNET_URL)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
-        self.client.API_URL = 'https://testnet.binancefuture.com'
 
     def get_precision(self, symbol):
         info = self.client.futures_exchange_info()
@@ -57,16 +56,33 @@ class BinanceOrder:
             quantity = self.balance.get_max_qty(symbol, leverage) * max_quantity_ratio
         precision = self.get_precision(symbol)
         quantity = float(round(quantity, precision))
-        self.client.futures_create_order(
-            symbol=symbol,
-            side=side,
-            type='MARKET',
-            timeInForce='GTC',
-            quantity=quantity,
-            price=price,
-            recvWindow=5000,
-            timestamp=get_server_time()
-        )
+
+        symbol = symbol,
+        side = side,
+        type = 'MARKET',
+        timeInForce = 'GTC',
+        quantity = quantity,
+        price = price,
+        recvWindow = 5000,
+        timestamp = get_server_time()
+
+        params = {
+            'symbol': symbol,
+            'side': side,
+            'type': type,
+            'timeInForce': Client.TIME_IN_FORCE_GTC,
+            'quantity': quantity,
+            'closePosition': price,
+            'recvWindow': 5000,
+            'timestamp': get_server_time()
+        }
+
+        query_string = "&".join([f"{k}={v}" for k, v in params.items()])
+        signature = hmac.new(self.client.API_SECRET.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+
+        params['signature'] = signature
+
+        Client.futures_create_order(**params)
 
 
 class BinanceTrading:

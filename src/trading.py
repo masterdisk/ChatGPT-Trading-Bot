@@ -41,7 +41,7 @@ class BinanceBalance:
 
 class BinanceOrder:
     def __init__(self, api_key, api_secret):
-        self.client = Client(api_key, api_secret, Client.FUTURES_TESTNET_URL)
+        self.client = Client(api_key, api_secret)
         self.leverage = BinanceLeverage(api_key, api_secret)
         self.balance = BinanceBalance(api_key, api_secret)
         self.client.API_URL = Client.API_TESTNET_URL

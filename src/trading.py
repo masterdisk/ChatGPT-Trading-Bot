@@ -3,6 +3,7 @@ import time
 import requests
 import hmac
 import hashlib
+from src.logger import logger
 
 
 class BinanceLeverage:
@@ -84,7 +85,7 @@ class BinanceOrder:
 
         Client.futures_create_order(**params)
 
-
+        logger.info(**params)
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)

@@ -21,7 +21,7 @@ def tradingview_request():
             'code': 'error',
             'message': 'Invalid passphrase'
         }
-
+    logger.warning(data)
     symbol = data.get('symbol')
     leverage = data.get('leverage')
     quantity = data.get('quantity')

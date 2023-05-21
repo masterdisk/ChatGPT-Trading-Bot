@@ -27,6 +27,7 @@ def get_server_time():
     """
     URL = "https://testnet.binancefuture.com/fapi/v1/time"
     response = requests.get(URL)
+    logger.warning('+++++++++++++++++++++' + response.json()["serverTime"] + '++++++++++++++++++++++++++++++')
     return response.json()["serverTime"]
 
 
@@ -66,9 +67,6 @@ class BinanceOrder:
         precision = self.get_precision(symbol)
         quantity = float(round(quantity, precision))
 
-        logger.warning('p========EDUARDO _ PRIVATE KEY =======' + self.client.API_SECRET)
-        logger.warning('p========EDUARDO _ API KEY =======' + self.client.API_KEY)
-
         params = {
             'symbol': symbol,
             'side': side,
@@ -80,21 +78,19 @@ class BinanceOrder:
             'timestamp': get_server_time()
         }
 
-        logger.warning('p========EDUARDO _ params =======' + str(params))
-
-
         query_string = "&".join([f"{k}={v}" for k, v in params.items()])
         signature = hmac.new(self.client.API_SECRET.encode('utf-8'), query_string.encode('utf-8'),
                              hashlib.sha256).hexdigest()
 
         params['signature'] = signature
-
+        logger.warning('+++++++++++++++++++++' + str(params) + '++++++++++++++++++++++++++++++')
         self.client.futures_create_order(**params)
 
 
 class BinanceTrading:
     def __init__(self, api_key, api_secret):
         self.order = BinanceOrder(api_key, api_secret)
+
     def buy(self, symbol, leverage, price, quantity=None, max_quantity_ratio=0.1):
         self.order.create_order(Client.SIDE_BUY, symbol, leverage, price, quantity, max_quantity_ratio)
 

@@ -32,7 +32,7 @@ def tradingview_request():
     if data.get('message') == 'Sell' or data.get('message') == 'Buy_Exit':
         logger.info(
             f'SELL: {symbol}, leverage: {leverage},price: {{price}}, quantity: {quantity}, max_quantity_ratio: {max_quantity_ratio}')
-        binance_trading.sell()
+        binance_trading.sell(symbol, leverage, price, quantity, max_quantity_ratio)
     elif data.get('message') == 'Buy' or data.get('message') == 'Sell_Exit':
         logger.info(
             f'BUY: {symbol}, leverage: {leverage}, quantity: {quantity}, max_quantity_ratio: {max_quantity_ratio}')

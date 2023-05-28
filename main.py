@@ -29,7 +29,6 @@ def tradingview_request():
     price = data.get('price')
     max_quantity_ratio = data.get('max_quantity_ratio')
     message = data.get('message')
-
     logger.info(f'symbol: {symbol}, leverage: {leverage}, price: {price}, quantity: {quantity}, '
                 f'max_quantity_ratio: {max_quantity_ratio}, message: {message}')
 
